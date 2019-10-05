@@ -344,13 +344,23 @@ total = data.frame(day = c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
                    )
 
 knitr::kable(total)
+```
+**Based on the data, we can see that the sum of the activity count of a day periodically fluctuates.Once the sum is high, it goes down for a couple of days and then rises up again.
 
-ggplot(total,aes(x = day,y = sum))+
+```{r}
+total = total %>% 
+  mutate(
+    week = c(rep(1,7),rep(2,7),rep(3,7),rep(4,7),rep(5,7))
+  )
+ggplot(total,aes(x = day,y = sum,fill = week))+
   geom_point()+
   geom_bar(stat = "identity" , position = "dodge",width = 0.4)+
   geom_smooth()
 ```
-**Based on the data, we can see that the sum of the activity count of a day periodically fluctuates.When we look at the smooth of the data, the trend goes like a curve. In the first 14 days, the sum of activity count rises up and in the next 20 days, the sum of activity count goes down. Then, the trend goes up again.
+*When we look at the smooth of the data, the trend goes like a curve. In the first 14 days, the sum of activity count rises up and in the next 10 days, the sum of activity count goes down. Then, the trend goes up again.
+
+
+
 
 
 
