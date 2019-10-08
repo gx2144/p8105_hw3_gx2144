@@ -13,15 +13,6 @@ data("instacart")
 data("brfss_smart2010")
 ```
 
-## ggplot set
-```{r}
-knitr::opts_chunk$set(
-  fig.width = 6,
-  fig.asp = .6,
-  out.width = "90%"
-)
-```
-
 ## Problem 1
 
 * Dataset Discription:
@@ -46,26 +37,71 @@ knitr::opts_chunk$set(
 
 * Use the 1st row as an example.The first order user:112108 bought was Bulgarian yogurt from yogurt aisle(id = 120) of dairy eggs department(id = 16). This product has been reorderd after 9 days of its last order at the 4th day of the week,10 am. The product id is 49302 and the order id is 1. 
 
+## Format data
 ```{r}
+instacart = instacart %>% 
+  mutate(
+    aisle = as.factor(aisle), 
+    order_dow = recode(order_dow, 
+                       "0" = "Sunday",
+                       "1" = "Monday",
+                       "2" = "Tuesday",
+                       "3" = "Wedensday",
+                       "4" = "Thursday",
+                       "5" = "Friday",
+                       "6" = "Saturday"),
+    order_dow = as.factor(order_dow)
+  
+         )        
+```
+
+## count the aisle
+```{r count the aisle and show the top1 aisle}
 aislename = instacart %>% 
   select("aisle") %>% 
   distinct()  
 nrow(aislename)
 
 ```
-There are 134 aisles here.
-```{r}  
-mostorder = instacart %>%
-  group_by(aisle) %>%
+
+* There are 134 aisles here.
+
+```{r show top aisles}
+topaisle = instacart %>% 
+  group_by(aisle) %>% 
   count( name = "count") %>% 
   arrange(desc(count)) %>% 
-  filter(count >= 10000)   
-ggplot(mostorder,aes(x = aisle,y = count))+
+  head(n = 5L)  
+knitr::kable(topaisle)
+  
+```
+
+* The Top 5 aisles are fresh vegetables, fresh fruits, packaged vegetables fruits, yogurt and packaged cheese. 
+
+
+## Number of items in each aisle
+```{r}  
+aislenumber = instacart %>% 
+  count(aisle, name = "count") %>% 
+  arrange(desc(count)) %>% 
+  filter(count > 10000) %>% 
+  mutate(
+    rank = c(1:length(aisle)),
+    aisle = fct_reorder(aisle , rank)
+        ) 
+
+ggplot(aislenumber,aes(x = rank,y = count, color = aisle))+
   geom_point()+
+  labs(
+    title = "number of order in each aisle plot",
+    x = "rank of aisle ",
+    y = "count of aisle"
+  )+
   theme(
-    axis.text.x = element_text(angle = 90, hjust = 0.5,
-    vjust = 0.5))+
-  ylim(5000,160000)
+    legend.text = element_text( size = 7),
+    legend.position = "bottom"
+    )
+  
 ```
 Most items ordered from the aisle is fresh vegetables.
 
