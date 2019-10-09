@@ -299,7 +299,7 @@ ggplot(hourcourse,aes(x = minutes,y = mean,
     discrete = TRUE
   )+
   theme(axis.text.x=element_text(angle = 90, colour = "black")）
-hourcourse
+
 
 ```
 
