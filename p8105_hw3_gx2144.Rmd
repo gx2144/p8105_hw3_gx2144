@@ -234,8 +234,8 @@ ggplot(NY,aes(x = response,y = response_value,fill =place ))+
 We can see from this two panels that for Bronx county, the data was collected only in 2010 and people's response to their overall health is "Fair".For Kings County, people in 2006 thought their response to overall health is fair but things changed in 2010. Most of them thought they have "Excellent" or "Very good" response to their overall health status and only few of them responsed "poor".For New York county, people's response to overally health has improved from "Poor" to "Fair".For Queens County, data in 2006 shows that they thought their ovrall health status is "Good". For people living in Suffolk County, their health status decreased over the years.As for those living in Westchester County, data collcted in 2010 shows that most of them thought they have "Excellent" or "Very good" response to their overall health status and only few of them responsed "poor".
 
 ## problem 3
-```{r}
-options(digits=4)
+```{r data wrangling}
+options(digits=0)
 
 accelerometer = read.csv("./accel_data.csv") %>% 
   na.omit() %>% 
@@ -252,42 +252,58 @@ accelerometer = read.csv("./accel_data.csv") %>%
   select(dayorweekends,everything()) %>% 
   pivot_longer(
     activity.1:activity.1440,
-    names_to = "activity",
-    values_to = "activity count"
-    
-  )
+    names_to = "minutes",
+    names_prefix = "activity.",
+    values_to = "activity_count"
+  ) %>% 
+  mutate(
+    minutes = as.numeric(minutes)
+         )
   
 ```
 
 * Descirption:
-In this chart, column names are dayorweekends,week,day_id,day,activity and activity count. "dayorweekends" denotes whether the day is weekday or weekends;"week" denotes the nth week of the activity'"day_id" denotes the order of the day;"activity" denotes the time of the record in a day;"activity count" denotes the count of each activity.
+In this chart, column names are dayorweekends,week,day_id,day,minutes and activity count. "dayorweekends" denotes whether the day is weekday or weekends;"week" denotes the nth week of the activity'"day_id" denotes the order of the day;"minutes" denotes the time of the record in a day;"activity count" denotes the count of each activity.
 Each day, there are 24*60 =1440 times of activity records and this record last for 5 weeks,equals to 35 days. So the sum of the acitivity counts is 50400, which is the same as the row number here.
 
+### total activity over the day
 ```{r}
-meanday = accelerometer %>% 
+totalday = accelerometer %>% 
   group_by(day_id ) %>% 
   summarize(
-    total = sum(`activity count`)
+    total = sum(activity_count)
     )
 
-knitr::kable(meanday)
+knitr::kable(totalday)
 ```
 
 * Based on the data, we can see that the sum of the activity count of a day periodically fluctuates.Once the sum is high, it goes down for a couple of days and then rises up again.
 
+### inspection activity over the course of the day
+
 ```{r}
 hourcourse = accelerometer %>% 
-  group_by(day_id,day) %>% 
-  summarize(
-    total = sum(`activity count`)
-) %>% 
-ggplot(aes(x = day_id,y = total))+
-  geom_point()+
-  geom_line(stat = "identity" ,aes(color = day))
+  group_by(day,minutes) %>% 
+  summarize(mean = mean(activity_count)) 
+
+ggplot(hourcourse,aes(x = minutes,y = mean, 
+                      color= day))+
+  geom_point(alpha = .5)+
+  labs(
+    title = "Activity over the course of the day",
+    x = "minutes in the day",
+    y = "Mean activity value",
+    color = "Day of the week") + 
+  scale_x_continuous( breaks=seq(0，1440，60))+
+  viridis::scale_color_viridis(
+    discrete = TRUE
+  )+
+  theme(axis.text.x=element_text(angle = 90, colour = "black")）
 hourcourse
+
 ```
 
-* When we look at the smooth of the data, the trend goes like a curve. Overall, as days gone by, total activity count rised first and then decreased, then rised up or keep parallel to the x axis in the end. Among 7 days of week, Sunday and Saturday have unique curves which keep on decreasing over the days. This may imply that this patient used to relax and keep sedentary during weekends.
+* We can clearly see that this patients do more activity during the day and rest during the night, Also, we may conclude that this patient gets up at around 6:30 in the morning where the mean activity values are higher.Around 11:00am during the day, this patient did more activities which means that he may have lunch during this time period.Then around 8pm-9pm, the patient exercised more and then rested around 10pm at night.
 
 
 
