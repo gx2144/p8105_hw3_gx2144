@@ -213,8 +213,7 @@ ggplot(excellent,aes(x = year,y = meanvalue))+
  
 ```
 
-* Comment: 
-We can see from this ""spaghetti"plot that the mean of the response_value flucuate with the years. The highest response is around 27 and the lowest response is around 15.
+* We can see from this ""spaghetti"plot that the mean of the response_value flucuate with the years. The highest response is around 27 and the lowest response is around 15.
 
 
 ```{r}
@@ -233,8 +232,7 @@ ggplot(NY,aes(x = response,y = response_value,fill =place ))+
 
 ```
 
-* Comment:
- * We can see from this two panels that for Bronx county, the data was collected only in 2010 and the most response to their overall health is "Good".
+ * For Bronx county, the data was collected only in 2010 and the most response to their overall health is "Good".
  * For Erie County, data was collected in 2010 and most of them responsed as "Very Good".
  * For Kings County, people in 2006 thought their response to overall health is mostly "Good", but things changed in 2010. Most of them thought they have "Very good" response to their overall health status and only few of them responsed "poor".
  * For Monroe county, people's response to "Very Good" most .
@@ -275,8 +273,7 @@ accelerometer = read.csv("./accel_data.csv") %>%
   
 ```
 
-* Descirption:
-In this chart, column names are dayorweekends,week,day_id,day,minutes and activity count. "dayorweekends" denotes whether the day is weekday or weekends;"week" denotes the nth week of the activity'"day_id" denotes the order of the day;"minutes" denotes the time of the record in a day;"activity count" denotes the count of each activity.
+* In this chart, column names are dayorweekends,week,day_id,day,minutes and activity count. "dayorweekends" denotes whether the day is weekday or weekends;"week" denotes the nth week of the activity'"day_id" denotes the order of the day;"minutes" denotes the time of the record in a day;"activity count" denotes the count of each activity.
 Each day, there are 24*60 =1440 times of activity records and this record last for 5 weeks,equals to 35 days. So the sum of the acitivity counts is 50400, which is the same as the row number here.
 
 ### total activity over the day
