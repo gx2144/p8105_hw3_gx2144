@@ -171,12 +171,13 @@ knitr::kable(meanhour,digits = 0)
 brfss_smart2010 = brfss_smart2010 %>% 
   janitor::clean_names() %>%
     separate(locationdesc, into = c("location" , "place"), sep = 4) %>% 
-    select(year, locationabbr,  state = locationabbr, place, response_value = data_value, -location, response, topic) %>% 
-  filter(topic == "Overall Health"& 
-         response == c("Excellent","Very good","Fair","Good","Poor")) %>%
+    select(year, locationabbr,  state = locationabbr, 
+    place,response_value = data_value, -location, response, topic) %>% 
+    filter(topic == "Overall Health"& 
+           response %in% c("Excellent","Very good","Fair","Good","Poor")) %>%
   mutate(
     response = factor(response, 
-               levels = c("Excellent","Very good","Good","Fair","Poor"))
+    levels = c("Excellent","Very good","Good","Fair","Poor"))
          ) 
 ```
 
@@ -184,16 +185,17 @@ brfss_smart2010 = brfss_smart2010 %>%
 ```{r}
 states = brfss_smart2010 %>%
   select(year,state,place,response) %>% 
-  filter(year == "2002"|year == "2010") %>%
+  filter(year == "2002"| year == "2010") %>%
   group_by(year,state) %>% 
-  summarize(n = n_unique(place)) %>% 
-  filter(n >= 7) %>% 
-  arrange(n)
+  summarize(
+    count = n_unique(place) 
+    )%>% 
+  filter(count >= 7) 
 ```
 
-* There are only one state which were observed at 7 or more locations in 2002 which is PA.
+* There are only 6 states which were observed at 7 or more locations in 2002 which were CT,FL,MA,NC,NJ,PA.
 
-* There are 7 state which were observed at 7 or more locations in 2010.They were CA,WA,NC,NJ,MD,TX,FL.Compared to 2002,more states were observed and more locations were surveyed.And there were big differences between the choice of state where the survey was conducted.Changes between 2002 and 2010 reflect potential public health concerns given by the investigators.
+* There are 14 states which were observed at 7 or more locations in 2010.They were CA,CO,FL,MA,MD,NC,NE,NJ,NY,OH,PA,SC,TX,WA.Compared to 2002,more states were observed and more locations were surveyed.And there were big differences between the choice of state where the survey was conducted.Changes between 2002 and 2010 reflect potential public health concerns given by the investigators.
 
 ```{r}
 excellent = brfss_smart2010 %>%
@@ -205,12 +207,14 @@ excellent = brfss_smart2010 %>%
   
 ggplot(excellent,aes(x = year,y = meanvalue))+
     geom_line(aes(color = state)) + 
-    theme(legend.position = "right")+       
+    theme_set(theme_minimal() + 
+              theme(legend.position = "right"))+       
     scale_y_continuous(breaks = seq(0,40,5))
  
 ```
 
-* comment:
+* Comment: 
+We can see from this ""spaghetti"plot that the mean of the response_value flucuate with the years. The highest response is around 27 and the lowest response is around 15.
 
 
 ```{r}
@@ -221,17 +225,23 @@ NY = brfss_smart2010 %>%
          ) %>% 
   select(-state)
 ggplot(NY,aes(x = response,y = response_value,fill =place ))+
-      geom_bar(stat = "identity" , position = "dodge",width = 0.4)+
+      geom_bar(stat = "identity" , position = "dodge",width = 0.8)+
       theme(legend.position = "right")+
       ggthemes::theme_excel()+
       scale_y_continuous(breaks = seq(0,30,2))+
       facet_grid(. ~ year)
 
- 
 ```
 
-* comment:
-We can see from this two panels that for Bronx county, the data was collected only in 2010 and people's response to their overall health is "Fair".For Kings County, people in 2006 thought their response to overall health is fair but things changed in 2010. Most of them thought they have "Excellent" or "Very good" response to their overall health status and only few of them responsed "poor".For New York county, people's response to overally health has improved from "Poor" to "Fair".For Queens County, data in 2006 shows that they thought their ovrall health status is "Good". For people living in Suffolk County, their health status decreased over the years.As for those living in Westchester County, data collcted in 2010 shows that most of them thought they have "Excellent" or "Very good" response to their overall health status and only few of them responsed "poor".
+* Comment:
+ * We can see from this two panels that for Bronx county, the data was collected only in 2010 and the most response to their overall health is "Good".
+ * For Erie County, data was collected in 2010 and most of them responsed as "Very Good".
+ * For Kings County, people in 2006 thought their response to overall health is mostly "Good", but things changed in 2010. Most of them thought they have "Very good" response to their overall health status and only few of them responsed "poor".
+ * For Monroe county, people's response to "Very Good" most .
+ * For Nassau County, data in 2006 and 2010 shows that majority of them thought their ovrall health status is "Very Good". 
+ * For people living in Queens County, their health status distribution remained the same over the years .
+ * As for those living in Westchester County, their health status distribution remained the same over the years. Most of them responsed "Very Good".
+ * As to Suffolk County, their health status distribution remained the same over the years.Most of them responsed "Very Good."
 
 ## problem 3
 ```{r data wrangling}
@@ -239,7 +249,9 @@ options(digits=0)
 
 accelerometer = read.csv("./accel_data.csv") %>% 
   na.omit() %>% 
-  mutate(
+  mutate(week = as.factor(week),
+    day = factor(day, levels = c("Sunday", "Monday", "Tuesday",
+   "Wednesday","Thursday", "Friday",    "Saturday")),
     dayorweekends = recode(day,
       Friday = "weekdays",
       Thursday = "weekdays",
@@ -247,7 +259,8 @@ accelerometer = read.csv("./accel_data.csv") %>%
       Tuesday = "weekdays",
       Monday = "weekdays",
       Saturday = "weekdend",
-      Sunday = "weekdend")
+      Sunday = "weekdend"),
+    
     ) %>% 
   select(dayorweekends,everything()) %>% 
   pivot_longer(
@@ -268,8 +281,9 @@ Each day, there are 24*60 =1440 times of activity records and this record last f
 
 ### total activity over the day
 ```{r}
+options(scipen = 10)
 totalday = accelerometer %>% 
-  group_by(day_id ) %>% 
+  group_by(week, day ) %>% 
   summarize(
     total = sum(activity_count)
     )
@@ -277,7 +291,7 @@ totalday = accelerometer %>%
 knitr::kable(totalday)
 ```
 
-* Based on the data, we can see that the sum of the activity count of a day periodically fluctuates.Once the sum is high, it goes down for a couple of days and then rises up again.
+* Based on the data, we can see that the sum of the activity count of a day periodically fluctuates.Once the sum is high, it goes down for a couple of days and then rises up again. Also it seems like the patients does activities more on Sunday and Friday.
 
 ### inspection activity over the course of the day
 
