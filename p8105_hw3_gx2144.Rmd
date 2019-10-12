@@ -95,7 +95,7 @@ aislenumber = instacart %>%
         ) 
 
 ggplot(aislenumber,aes(x = rank,y = count, fill = aisle))+
-  geom_bar(stat = "identity", width = 0.7)
+  geom_bar(stat = "identity", width = 0.7)+
   labs(
     title = "number of order in each aisle plot",
     x = "rank of aisle ",
@@ -228,6 +228,7 @@ ggplot(NY,aes(x = response,y = response_value,fill =place ))+
       theme(legend.position = "right")+
       ggthemes::theme_excel()+
       scale_y_continuous(breaks = seq(0,30,2))+
+      theme(axis.text.x = element_text(size = 8, vjust = 0.5, hjust = 0.5, angle = 45))+
       facet_grid(. ~ year)
 
 ```
