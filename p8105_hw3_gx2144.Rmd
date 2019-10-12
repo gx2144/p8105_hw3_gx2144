@@ -94,8 +94,8 @@ aislenumber = instacart %>%
     aisle = fct_reorder(aisle , rank)
         ) 
 
-ggplot(aislenumber,aes(x = rank,y = count, color = aisle))+
-  geom_point()+
+ggplot(aislenumber,aes(x = rank,y = count, fill = aisle))+
+  geom_bar(stat = "identity", width = 0.7)
   labs(
     title = "number of order in each aisle plot",
     x = "rank of aisle ",
