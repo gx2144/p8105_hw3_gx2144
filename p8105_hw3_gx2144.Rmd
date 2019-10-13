@@ -176,7 +176,7 @@ brfss_smart2010 = brfss_smart2010 %>%
            response %in% c("Excellent","Very good","Fair","Good","Poor")) %>%
   mutate(
     response = factor(response, 
-    levels = c("Excellent","Very good","Good","Fair","Poor"))
+    levels = c("Poor","Fair","Good","Very good","Excellent"))
          ) 
 ```
 
