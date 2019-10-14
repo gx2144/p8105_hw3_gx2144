@@ -146,13 +146,14 @@ meanhour = instacart %>%
    filter(product_name %in%  c("Pink Lady Apples","Coffee Ice Cream")) %>%
    group_by(product_name,order_dow) %>% 
    summarize(
-     meanhour = mean(order_hour_of_day)) %>% 
+     meanhour = mean(order_hour_of_day)
+     )%>% 
    pivot_wider(
     names_from = order_dow,
     values_from = meanhour
   ) 
 
-knitr::kable(meanhour)
+knitr::kable(meanhour, digits = 1)
 ```
 
 * For Coffee Ice cream, mean hour of the day at which it has been ordered shows that on weekdays, it was ordered in the afternoon aroud 3pm.However, on the weekends, customers like to order around noon. Friday is unique because on that day, the mean hour when the products were ordered was around 10am.
