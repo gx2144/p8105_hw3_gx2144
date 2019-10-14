@@ -16,7 +16,7 @@ data("brfss_smart2010")
 ## Problem 1
 
 * Dataset Discription:
-
+* Each row is an observation, each column is a variable.
 * There are 15 variables and 1,384,617 columns for each variable.Meanings of each variable are listed below: 
 
   * order_id: order identifier, to identify different orders.
@@ -42,17 +42,13 @@ data("brfss_smart2010")
 instacart = instacart %>% 
   mutate(
     aisle = as.factor(aisle), 
-    order_dow = recode(order_dow, 
-                       "0" = "Sunday",
-                       "1" = "Monday",
-                       "2" = "Tuesday",
-                       "3" = "Wedensday",
-                       "4" = "Thursday",
-                       "5" = "Friday",
-                       "6" = "Saturday"),
-    order_dow = as.factor(order_dow)
+    order_dow = factor(order_dow, 
+                       labels = c("Sunday", "Monday", "Tuesday",
+                       "Wednesday","Thursday", "Friday", "Saturday"))
+    )
+    
   
-         )        
+               
 ```
 
 ## Problem1
@@ -98,7 +94,7 @@ ggplot(aislenumber,aes(x = rank,y = count, fill = aisle))+
   labs(
     title = "number of order in each aisle plot",
     x = "rank of aisle ",
-    y = "count of aisle"
+    y = "count"
   )+
   theme(
     legend.text = element_text( size = 7),
@@ -147,16 +143,16 @@ knitr::kable(pop2)
 ### Apple and Ice Cream 
 ```{r,warning=FALSE}
 meanhour = instacart %>% 
-   filter(product_name ==  c("Pink Lady Apples","Coffee Ice Cream")) %>%
+   filter(product_name %in%  c("Pink Lady Apples","Coffee Ice Cream")) %>%
    group_by(product_name,order_dow) %>% 
    summarize(
-     meanhour = round(mean(order_hour_of_day),digit =2)) %>% 
+     meanhour = mean(order_hour_of_day)) %>% 
    pivot_wider(
     names_from = order_dow,
     values_from = meanhour
   ) 
 
-knitr::kable(meanhour,digits = 0)
+knitr::kable(meanhour)
 ```
 
 * For Coffee Ice cream, mean hour of the day at which it has been ordered shows that on weekdays, it was ordered in the afternoon aroud 3pm.However, on the weekends, customers like to order around noon. Friday is unique because on that day, the mean hour when the products were ordered was around 10am.
@@ -243,8 +239,6 @@ ggplot(NY,aes(x = response,y = response_value,fill =place ))+
 
 ## problem 3
 ```{r data wrangling}
-options(digits=0)
-
 accelerometer = read.csv("./accel_data.csv") %>% 
   na.omit() %>% 
   mutate(week = as.factor(week),
@@ -305,7 +299,7 @@ ggplot(hourcourse,aes(x = minutes,y = mean,
     x = "hour of the day",
     y = "Mean activity value",
     color = "Day of the week") + 
-  scale_x_continuous( breaks=seq(0，1440，60),
+  scale_x_continuous( breaks=seq(0 , 1440 , 60),
                       labels = c("0","1","2","3","4","5","6","7","8",
                       "9","10","11","12","13","14","15","16",
                       "17","18","19","20","21","22","23","24")
